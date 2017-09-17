@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>football league</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-sanitize.js"></script>
+</head>
+
+<body>
+
+<div class="w3-container w3-content w3-card" ng-app="myApp" >
+    <div class="w3-panel w3-light-grey w3-round">
+        <h1>Football League</h1>
+    </div>
+    <div class="w3-container w3-text-grey" ng-controller="myCtrl">
+        <h3><b>Competitions</b></h3>
+        <br/>
+        <div ng-repeat="x in myData" >
+            <p ng-click="points(x.id)">{{x.caption}}</p>
+            <hr/>
+        </div>
+        <h3><b>Points</b></h3>
+        <br/>
+        
+        <table class="w3-table">
+            <tr>
+                <th>Team Name</th>
+                <th>playedGames</th>
+                <th>points</th>
+                <th>goals</th>
+                <th>wins</th>
+                <th>draws</th>
+                <th>losses</th>
+            </tr>
+            <tr ng-repeat="y in point.standing">
+                <td ng-click="players(y._links.team.href)">{{y.teamName}}</td>
+                <td>{{y.playedGames}}</td>
+                <td>{{y.points}}</td>
+                <td>{{y.goals}} </td>
+                <td>{{y.wins}}</td>
+                <td>{{y.draws}}</td>
+                <td>{{y.losses}}</td>
+            </tr>
+        </table>
+        
+        <h3><b>Players details</b></h3>
+        <br/>
+           <table class="w3-table">
+            <tr>
+                <th>name</th>
+                <th>position</th>
+                <th>jerseyNumber</th>
+                <th>dateOfBirth</th>
+                <th>nationality</th>
+                
+            </tr>
+            <tr ng-repeat="z in playerList.players">
+                <td >{{z.name}}</td>
+                <td>{{z.position}}</td>
+                <td>{{z.jerseyNumber}}</td>
+                <td>{{z.dateOfBirth}} </td>
+                <td>{{z.nationality}}</td>
+                
+            </tr>
+        </table>
+         
+        <h3><b>Upcoming fixtures</b></h3>
+        <br/>
+        <table class="w3-table">
+            <tr>
+                <th>home Team</th>
+                <th>awayTeam</th>
+            </tr>
+            <tr ng-repeat="a in fixtures.fixtures">
+                <td >{{a.homeTeamName}}</td>
+                <td>{{a.awayTeamName}}</td>
+                
+                
+            </tr>
+        </table>
+        
+    </div>
+</div>
+<script>
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope, $http) {
+  $http({
+  headers: { 'X-Auth-Token': 'b3cfb52f83e74d17b3fe1cea5fb586cf' },
+    url : "http://api.football-data.org/v1/competitions/?season=2017",
+      method : "GET"
+  }).then(function mySuccess(response) {
+      $scope.myData = response.data;
+    });
+     
+     
+    $scope.points = function(p) {
+        ur="http://api.football-data.org/v1/competitions/"+p+"/leagueTable";
+        $http({
+  headers: { 'X-Auth-Token': 'b3cfb52f83e74d17b3fe1cea5fb586cf' },
+    url : ur,
+      method : "GET"
+  }).then(function mySuccess(response) {
+      //$scope["point"+p]=response.data;
+            $scope.point=response.data;
+    });     
+    }
+    
+    $scope.players = function(l){
+        ur=l+"/players";
+        fixtures=l+"/fixtures";
+          $http({
+  headers: { 'X-Auth-Token': 'b3cfb52f83e74d17b3fe1cea5fb586cf' },
+    url : ur,
+      method : "GET"
+  }).then(function mySuccess(response) {
+      //$scope["point"+p]=response.data;
+            $scope.playerList=response.data;
+    });
+        
+             $http({
+  headers: { 'X-Auth-Token': 'b3cfb52f83e74d17b3fe1cea5fb586cf' },
+    url : fixtures,
+      method : "GET"
+  }).then(function mySuccess(response) {
+      //$scope["point"+p]=response.data;
+            $scope.fixtures=response.data;
+    });
+        
+        
+    }
+    
+    
+});
+
+</script>
+
+
+
+</body>
+</html>
